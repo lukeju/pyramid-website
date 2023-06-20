@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>Pyramid NeRF</title>
+
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- <base href="/"> -->
+
+        
+
+
+<!--     <link rel="apple-touch-icon" href="apple-touch-icon.png"> -->
+  <!-- <link rel="icon" type="image/png" href="img/seal_icon.png"> -->
+    <!-- Place favicon.ico in the root directory -->
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/codemirror.min.css">
+    <link rel="stylesheet" href="css/app.css">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.3/clipboard.min.js"></script>
+    
+    <script src="js/app.js"></script>
+</head>
+
+<body>
+    <div class="container" id="main">
+        <div class="row">
+            <h2 class="col-md-12 text-center">
+                <b>Pyramid NeRF</b>: Frequency Guided Fast Radiance Field Optimization.</br> 
+                <small>
+                    IJCV 2023
+                </small>
+            </h2>
+        </div>
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <ul class="list-inline">
+                    <li>
+                        <a>
+                            Junyu Zhu<sup><small>*</small></sup>
+                        </a>
+                        </br>Nanjing University
+                    </li>
+                    <li>
+                        <a href="https://pakfa.github.io/zhuhao_photo.github.io/">
+                            Hao Zhu<small></small><sup>*</sup></small>
+                        </a>
+                        </br>Nanjing University
+                    </li>
+                    <li>
+                        <a href="https://qzhang-cv.github.io/">
+                          Qi Zhang
+                        </a>
+                        </br>Tencent AI Lab
+                    </li><br>
+                    <li>
+                        <a>
+                          Fang Zhu
+                        </a>
+                        </br>ZTE Microelectronics
+                    </li>
+                    <li>
+                        <a href="https://vision.nju.edu.cn/fc/d3/c29470a457939/page.htm">
+                          Zhan Ma
+                        </a>
+                        </br>Nanjing University
+                    </li>
+                    <li>
+                        <a href="https://cite.nju.edu.cn/People/Faculty/20190621/i5054.html">
+                          Xun Cao<sup>#</sup>
+                        </a>
+                        </br>Nanjing University
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+        <div class="row">
+                <div class="col-md-4 col-md-offset-4 text-center">
+                    <ul class="nav nav-pills nav-justified">
+                        <li>
+                            <a href="https://link.springer.com/article/10.1007/s11263-023-01829-3">
+                            <image src="imgs/paper.png" height="60px">
+                                <h4><strong>Paper</strong></h4>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/lukeju/Pyramid-NeRF">
+                            <image src="imgs/github.png" height="60px">
+                                <h4><strong>Code</strong></h4>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+        </div>
+
+
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Abstract
+                </h3>
+                <image src="imgs/pyramid_training.PNG" class="img-responsive" alt="overview"><br>
+                <p class="text-justify">
+                    Novel view synthesis using implicit neural functions such as Neural Radiance Field (NeRF) has achieved significant progress recently. However, it is very computationally expensive to train a NeRF due to the disordered frequency optimization. 
+                    In this paper, we propose the Pyramid NeRF, which guides the NeRF training in a 'low-frequency first, high-frequency second' style using the image pyramids and could improve the training and inference speed at 15× and 805×, respectively. 
+                    The high training efficiency is guaranteed by (i) organized frequency-guided optimization could improve the convergency speed and efficiently reduce the training iterations and (ii) progressive subdivision, which replaces a single large multi-layer perceptron (MLP) with thousands of tiny MLPs, could significantly decrease the execution time of running MLPs. 
+                    Experiments on various synthetic and real scenes verify the high efficiency of the Pyramid NeRF. Meanwhile, the structure and perceptual similarities could be better recovered.
+                </p>
+            </div>
+        </div>
+
+
+
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Pyramid NeRF 
+                </h3>
+                <p class="text-justify">
+                    The proposed Pyramid NeRF comprises two parts, i.e., the organized frequency-guided optimization and the progressive subdivision. The former focuses on improving the convergency speed by guiding the training following the rule
+                    of 'low-frequency first, high-frequency second'. At the same time, the latter could decrease the running time of the network by reducing the MLP size.
+                <p style="text-align:center;">
+                    <image src="imgs/main_pipeline.PNG"  class="img-responsive">
+                </p>
+                
+                <p class="text-justify">
+                    Here, we show how radiance field change as training processes.
+                    <br><br>
+                    Our <em> organized frequency-guided optimization</em> solves the problem of disordered optimization and organizes the NeRF training following the orders of 'low-frequency first, high-frequency second'.
+                    Each input image is represented as a multi-scale image pyramid, and the INR fitting is conducted from the largest scale to the lowest one. Apart from this, the progressive subdivision is proposed to to reduce
+                    the execution time of running networks on each scale. 
+                </p>
+                
+                <video id="v0" width="100%" autoplay loop muted>
+                  <source src="imgs/lego_dog.mp4" type="video/mp4" />
+                </video>
+                <p class="text-justify">
+                    We can see that when training processes, the higher frequency features would be added to the radiance field. Difference of Gaussian contents between neighboring scales are shown in the second line of video.
+                </p>
+            </div>
+        </div>
+            
+
+            
+
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Results
+                </h3>
+                <p class="text-justify">
+                    We train NeRF, Torch-ngp, KiloNeRF and Pyramid NeRF on datasets Synthetic NeRF, Synthetic NSVF and BlendedMVS. Because the organized frequency-guided optimization
+                    is adopted, the proposed Pyramid NeRF could provide better structure similarity and perceptual similarity.
+                </p>                
+                <br>
+                <image src="imgs/comp_synthetic.PNG" class="img-responsive" alt="overview">
+                <p class="text-justify">
+                    Qualitative comparison on synthetic scenes. Considering the proposed frequency-guided optimization, our Pyramid NeRF is outperformed compared to state-of-the-art methods on the detail textures and occlusion boundaries.
+                </p>
+                <br>
+                <image src="imgs/comp_real.PNG" class="img-responsive" alt="overview">
+                <p class="text-justify" style="text-align:center">
+                    Qualitative comparison on real scenes.
+                </p>
+                </div>
+        </div>
+
+        
+            
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Citation
+                </h3>
+                <div class="form-group col-md-10 col-md-offset-1">
+                    <textarea id="bibtex" class="form-control" readonly>
+@article{junyu2023pyramidnerf,
+    title={Pyramid NeRF: Frequency Guided Fast Radiance Field Optimization},
+    author={Junyu Zhu and
+        Hao Zhu and Qi Zhang and Fang Zhu and Zhan Ma and Xun Cao},
+    journal={International Journal of Computer Vision},
+    year={2023}
+}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Acknowledgements
+                </h3>
+                The website template was borrowed from <a href="http://mgharbi.com/">Michaël Gharbi</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
